@@ -3,26 +3,23 @@
 #include <iomanip>  //для setprecision
 #include <iostream>
 #include <thread>
+#include <vector>
 
 #define N 8500
 #define repeats 100000
+#define cnt_thread 12
 
 template <typename T>
 class sort {
    public:
-    sort() : arr(new T[N]), copy(new T[N]), time_array(new double[repeats]) {
-        generate_new_arr();
-        std::copy(arr, arr + N, copy);
-    }
-
-    void generate_new_arr() {
-        srand((unsigned)time(NULL));
-        for (size_t i = 0; i < N; ++i) {
-            arr[i] = rand() % N;
+    sort() : arr(new T*[cnt_thread]), time_array(new double[repeats]) {
+        for (size_t i{}; i < cnt_thread; ++i) {
+            arr[i] = new T[N];
+            generate_new_arr(arr[i]);
         }
     }
 
-    void generate_new_arr(T * arr) {
+    void generate_new_arr(T* arr) {
         srand((unsigned)time(NULL));
         for (size_t i = 0; i < N; ++i) {
             arr[i] = rand() % N;
@@ -44,25 +41,33 @@ class sort {
     T* get_time_array() { return time_array; }
 
     void measure_time(const char* (*func_sort)(T*, int, int)) {
-        std::copy(copy, copy + N, arr);
         std::cout << "Размер массива : " << N
                   << " | Кол-во прогонов: " << repeats << "\n";
         double sum = 0;
         std::string func_name;
-        for (size_t i = 0; i < repeats; ++i) {
-            generate_new_arr();
-            // std::copy(copy, copy + N, arr);
+        std::vector<std::thread> threads;
+        for (size_t i{}; i < cnt_thread; ++i) {
+            threads.emplace_back([i, func_sort, this, &func_name, &sum]() {
+                for (size_t j = (repeats / cnt_thread) * i;
+                     j < (repeats / cnt_thread) * (i + 1); ++j) {
+                    generate_new_arr(arr[i]);
 
-            clock_t begin = clock();
-            func_name = func_sort(arr, 0, N - 1);
-            clock_t end = clock();
+                    clock_t begin = clock();
+                    func_name = func_sort(arr[i], 0, N - 1);
+                    clock_t end = clock();
 
-            time_array[i] = (double)(end - begin) / CLOCKS_PER_SEC;
-            sum += time_array[i];
-            std::cout << std::setprecision(3) << std::fixed
-                      << "Проценты : " << ((double)i / repeats) * 100
-                      << "% | Кол-во прогонов : " << i << "        \r"
-                      << std::flush;
+                    time_array[j] = (double)(end - begin) / CLOCKS_PER_SEC;
+                    sum += time_array[j];
+                    // std::cout << j << " | " << time_array[j] << '\n';
+                    // std::cout << std::setprecision(3) << std::fixed
+                    //           << "Проценты : " << ((double)j / repeats) * 100
+                    //           << "% | Кол-во прогонов : " << j << " \r"
+                    //           << std::flush;
+                }
+            });
+        }
+        for (size_t i{}; i < cnt_thread; ++i) {
+            threads[i].join();
         }
         std::cout << std::setprecision(6)
                   << "\rВремя сортировки за все прогоны : " << sum
@@ -78,14 +83,15 @@ class sort {
     }
 
     ~sort() {
+        for (size_t i{}; i < cnt_thread; ++i) {
+            delete[] arr[i];
+        }
         delete[] arr;
-        delete[] copy;
         delete[] time_array;
     }
 
    private:
-    T* arr;
-    T* copy;
+    T** arr;
     double* time_array;
 };
 
