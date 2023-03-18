@@ -50,7 +50,7 @@ void generate_new_arr(T* arr, size_t elem) {
 }
 
 auto main() -> int {
-    const size_t N = 1000, repeats = 10000, step = 30;
+    const size_t N = 1000, repeats = 100000, step = 30;
     int* arr_hoar = new int[N];
     int* arr_bubble = new int[N];
     double sum_hoar{}, sum_bubble{};
