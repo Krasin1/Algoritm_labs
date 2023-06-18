@@ -243,8 +243,8 @@ int main() {
             std::cout << "Шаг : " << i << " | Кол-во прогонов : " << j
                       << "       \r";
         }
-        deikstra << i << " " << 1000000 * sum_deikstra / repeats << '\n';
-        floyd << i << " " << 1000000 * sum_floyd / repeats << '\n';
+        deikstra << i << " " << std::fixed << std::setprecision(6) << 1000000 * sum_deikstra / repeats << '\n';
+        floyd << i << " " << std::fixed << std::setprecision(6)  << 1000000 * sum_floyd / repeats << '\n';
     }
 
     return 0;
