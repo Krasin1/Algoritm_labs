@@ -89,7 +89,6 @@ class deepMaze {
 
     void generate(size_t N) {
         std::pair<int, int> currnet_cell = std::make_pair(0, 0);
-        fillEmpty(N);
         while(1) {
             // usleep(500000);
             visited[currnet_cell.second][currnet_cell.first] = true;
@@ -100,7 +99,7 @@ class deepMaze {
                 stack.push(currnet_cell);
                 removeWalls(currnet_cell.first, currnet_cell.second, next_cell.first, next_cell.second);
                 currnet_cell = next_cell;
-                printMaze();
+                // printMaze();
             } else if (!stack.empty()) {
                     currnet_cell = stack.top();
                     stack.pop();

@@ -122,7 +122,7 @@ class Maze {
             horiz[endl][i] = true;
         }
         horiz[endl][endl] = true;
-        std::cout << '\n';
+        // std::cout << '\n';
     }
     void addEndLine() {
         assignUniqueSet(size - 1);
@@ -132,7 +132,6 @@ class Maze {
     }
 
     void generate(size_t n) {
-        fillEmpty(n);
         for (size_t i{}; i < size - 1; ++i) {
             assignUniqueSet(i);
             addingVerticalWalls(i);
